@@ -1,13 +1,7 @@
 from fastapi.testclient import TestClient
 from app.main import app
-import os
-
 
 client = TestClient(app)
-
-
-# NOTE: tests use the same sqlite file by default. For isolation you'd set TASKS_DB to a temp file.
-
 
 def test_crud_flow(tmp_path, monkeypatch):
     db_file = str(tmp_path / "test_tasks.db")

@@ -1,20 +1,19 @@
-<<<<<<< HEAD
 # Practica_TaskTracker
 A simple task managing and tracking program.
 =======
-Descrierea aplicației
+Descrierea aplicatiei
 
-    Aplicația este un Task Manager dezvoltat în Python folosind FastAPI și SQLite.
-    Permite gestionarea sarcinilor printr-un API REST și include funcționalități de:
+    Aplicatia este un Task Manager dezvoltat in Python folosind FastAPI si SQLite.
+    Permite gestionarea sarcinilor printr-un API REST si include functionalitati de:
     
-    Creare, citire, actualizare și ștergere task-uri (CRUD)
+    Creare, citire, actualizare si stergere task-uri (CRUD)
     
-    Filtrare task-uri după status sau deadline
+    Filtrare task-uri dupa status sau deadline
     
-    Exportul listei de sarcini în CSV sau JSON
+    Exportul listei de sarcini in CSV sau JSON
     
     (Optional) autentificare simpla prin header user
-Fiecare task are următoarele câmpuri:
+Fiecare task are urmatoarele campuri:
 
 | Camp        | Tip      | Descriere                      |
 |-------------| -------- | ------------------------------ |
@@ -22,19 +21,19 @@ Fiecare task are următoarele câmpuri:
 | title       | string   | Titlul task-ului               |
 | description | string   | Descriere task                 |
 | status      | string   | `to-do`, `in-progress`, `done` |
-| deadline    | date     | Data limită (opțional)         |
+| deadline    | date     | Data limita (optional)         |
 | owner       | string   | User asociat task-ului         |
-| created\_at | datetime | Data creării                   |
-| updated\_at | datetime | Data ultimei modificări        |
+| created\_at | datetime | Data crearii                   |
+| updated\_at | datetime | Data ultimei modificari        |
 
-Pași pentru instalare și rulare
+Pasi pentru instalare si rulare
 
     1.Cloneaza repository-ul:
         git clone <URL_REPO>
         cd Practica_TaskTracker
 
 
-    2.Creează un mediu virtual si instalează dependentele:
+    2.Creeaza un mediu virtual si instaleaza dependentele:
         python -m venv venv
         # Linux/Mac
         source venv/bin/activate
@@ -43,10 +42,10 @@ Pași pentru instalare și rulare
         
         pip install -r requirements.txt
 
-    3.Rulează serverul FastAPI:
+    3.Ruleaza serverul FastAPI:
         uvicorn app.main:app --reload
 
-    4.Accesează Swagger UI pentru testare rapida:
+    4.Acceseaza Swagger UI pentru testare rapida:
         http://127.0.0.1:8000/docs
 
 Exemple API:
@@ -92,5 +91,44 @@ Exemple API:
             curl -X GET "http://127.0.0.1:8000/tasks/export?format=csv" -H "X-User: testuser"
        Format json:
             curl -X GET "http://127.0.0.1:8000/tasks/export?format=json" -H "X-User: testuser"
+
+    Tehnologii:
+        - Python 3.12
+        - FastAPI
+        - SQLite
+        - HTML / JavaScript (frontend simplu)
+
+    Interfata Web (HTML)
+
+Aplicatia include un frontend simplu in HTML/JavaScript (index.html) care permite interactiunea cu API-ul:
+    
+    Adaugarea de task-uri (titlu, descriere, status, deadline)
+    Listarea tuturor task-urilor
+    Filtrarea task-urilor dupa status si deadline
+    Stergerea task-urilor
+    Header-ul X-User este trimis automat pentru a putea folosi autentificarea simpla.
+    Pagina poate fi deschisa direct in browser sau cu un Live Server (de exemplu in VSCode).
+
+Exemplu utilizare:
+
+    Deschide index.html in browser.
+
+    Completeaza titlu, descriere, deadline si apasa Adauga.
+
+    Task-urile apar in lista de mai jos, unde le poti filtra sau sterge.
+
+Structura proiectului:
+
+    - app
+        - main.py         # aplicatia FastAPI
+        - models.py       # modelele SQLAlchemy
+        - schemas.py      # Pydantic schemas
+        - crud.py         # functii CRUD
+        - db.py           # configurare baza de date
+        - utils.py        # functii auxiliare 
+    - index.html          # frontend simplu
+    - requirements.txt    # dependinte Python
+    - README.md
+
 
 >>>>>>> 716934f (Initial commit: setup FastAPI Task Manager)

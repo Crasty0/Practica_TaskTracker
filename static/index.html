@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Task Manager</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    input, button, select { margin: 5px; padding: 8px; }
+    .task { border: 1px solid #ccc; padding: 10px; margin-top: 5px; }
+    .filters { margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Task Manager</h1>
+
+  <h2>Adaugă Task</h2>
+  <input type="text" id="title" placeholder="Titlu">
+  <input type="text" id="description" placeholder="Descriere">
+  <input type="date" id="deadline">
+  <select id="status">
+    <option value="to-do">to-do</option>
+    <option value="in-progress">in-progress</option>
+    <option value="done">done</option>
+  </select>
+  <button onclick="createTask()">Adaugă</button>
+
+  <h2>Filtre</h2>
+  <div class="filters">
+    Status:
+    <select id="filter-status" onchange="loadTasks()">
+      <option value="">Toate</option>
+      <option value="to-do">to-do</option>
+      <option value="in-progress">in-progress</option>
+      <option value="done">done</option>
+    </select>
+    Deadline înainte de:
+    <input type="date" id="filter-deadline" onchange="loadTasks()">
+    <button onclick="clearFilters()">Clear</button>
+  </div>
+
+  <h2>Lista Task-uri</h2>
+  <div id="task-list"></div>
+
+  <script>
+    const API_URL = "http://127.0.0.1:8000";
+    const USER = "testuser"; // X-User header
+
+    async function loadTasks() {
+      const status = document.getElementById("filter-status").value;
+      const due_before = document.getElementById("filter-deadline").value;
+
+      let url = new URL(`${API_URL}/tasks`);
+      if (status) url.searchParams.append("status", status);
+      if (due_before) url.searchParams.append("due_before", due_before);
+
+      try {
+        const res = await fetch(url, {
+          headers: { "X-User": USER }
+        });
+        const tasks = await res.json();
+
+        if (!Array.isArray(tasks)) {
+          document.getElementById("task-list").innerHTML = "<p>Nu s-au putut încărca task-urile</p>";
+          console.error("Backend error:", tasks);
+          return;
+        }
+
+        document.getElementById("task-list").innerHTML =
+          tasks.map(t => `
+            <div class="task">
+              <b>${t.title}</b> - ${t.status}<br>
+              ${t.description}<br>
+              Deadline: ${t.deadline || "nedefinit"}<br>
+              <button onclick="deleteTask(${t.id})">Șterge</button>
+            </div>
+          `).join("");
+      } catch (err) {
+        console.error(err);
+        document.getElementById("task-list").innerHTML = "<p>Eroare la încărcarea task-urilor</p>";
+      }
+    }
+
+    async function createTask() {
+      const title = document.getElementById("title").value.trim();
+      const description = document.getElementById("description").value.trim();
+      const deadline = document.getElementById("deadline").value || null;
+      const status = document.getElementById("status").value;
+
+      if (!title || !description) {
+        alert("Trebuie completat titlu și descriere!");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/tasks`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-User": USER
+          },
+          body: JSON.stringify({ title, description, status, deadline })
+        });
+
+        if (!res.ok) {
+          const error = await res.json();
+          console.error("Backend error:", error);
+          alert("Eroare la adăugarea task-ului: " + (error.detail || res.status));
+        }
+
+        document.getElementById("title").value = "";
+        document.getElementById("description").value = "";
+        document.getElementById("deadline").value = "";
+        loadTasks();
+      } catch (err) {
+        console.error(err);
+        alert("Eroare la conectarea cu serverul");
+      }
+    }
+
+    async function deleteTask(id) {
+      if (!confirm("Sigur vrei să ștergi acest task?")) return;
+      try {
+        await fetch(`${API_URL}/tasks/${id}`, {
+          method: "DELETE",
+          headers: { "X-User": USER }
+        });
+        loadTasks();
+      } catch (err) {
+        console.error(err);
+        alert("Eroare la ștergerea task-ului");
+      }
+    }
+
+    function clearFilters() {
+      document.getElementById("filter-status").value = "";
+      document.getElementById("filter-deadline").value = "";
+      loadTasks();
+    }
+
+    // încarcă task-urile la pornirea paginii
+    loadTasks();
+  </script>
+</body>
+</html>
